@@ -4,7 +4,6 @@
 // https://github.com/swagger-api/swagger-codegen
 //
 
-import Foundation
 import Alamofire{{#usePromiseKit}}
 import PromiseKit{{/usePromiseKit}}
 
@@ -68,7 +67,7 @@ extension Data: JSONEncodable {
 
 private let dateFormatter: DateFormatter = {
     let fmt = DateFormatter()
-    fmt.dateFormat = Configuration.dateFormat
+    fmt.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
     fmt.locale = Locale(identifier: "en_US_POSIX")
     return fmt
 }()
@@ -85,104 +84,64 @@ extension UUID: JSONEncodable {
     }
 }
 
-/// Represents an ISO-8601 full-date (RFC-3339).
-/// ex: 12-31-1999
-/// https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14
-public final class ISOFullDate: CustomStringConvertible {
-
-    public let year: Int
-    public let month: Int
-    public let day: Int
-
-    public init(year: Int, month: Int, day: Int) {
-        self.year = year
-        self.month = month
-        self.day = day
+extension String {
+    func toBase64() -> String {
+        return Data(self.utf8).base64EncodedString()
     }
-
-    /**
-     Converts a Date to an ISOFullDate. Only interested in the year, month, day components.
-
-     - parameter date: The date to convert.
-
-     - returns: An ISOFullDate constructed from the year, month, day of the date.
-     */
-    public static func from(date: Date) -> ISOFullDate? {
-        let calendar = Calendar(identifier: .gregorian)
-
-        let components = calendar.dateComponents(
-            [
-                .year,
-                .month,
-                .day,
-            ],
-            from: date
-        )
-
-        guard
-            let year = components.year,
-            let month = components.month,
-            let day = components.day
-        else {
-            return nil
-        }
-
-        return ISOFullDate(
-            year: year,
-            month: month,
-            day: day
-        )
-    }
-
-    /**
-     Converts a ISO-8601 full-date string to an ISOFullDate.
-
-     - parameter string: The ISO-8601 full-date format string to convert.
-
-     - returns: An ISOFullDate constructed from the string.
-     */
-    public static func from(string: String) -> ISOFullDate? {
-        let components = string
-            .characters
-            .split(separator: "-")
-            .map(String.init)
-            .flatMap { Int($0) }
-        guard components.count == 3 else { return nil }
-
-        return ISOFullDate(
-            year: components[0],
-            month: components[1],
-            day: components[2]
-        )
-    }
-
-    /**
-     Converts the receiver to a Date, in the default time zone.
-
-     - returns: A Date from the components of the receiver, in the default time zone.
-     */
-    public func toDate() -> Date? {
-        var components = DateComponents()
-        components.year = year
-        components.month = month
-        components.day = day
-        components.timeZone = TimeZone.ReferenceType.default
-        let calendar = Calendar(identifier: .gregorian)
-        return calendar.date(from: components)
-    }
-
-    // MARK: CustomStringConvertible
-
-    public var description: String {
-        return "\(year)-\(month)-\(day)"
-    }
-
 }
 
-extension ISOFullDate: JSONEncodable {
-    public func encodeToJSON() -> Any {
-        return "\(year)-\(month)-\(day)"
+extension RawRepresentable where RawValue == String {
+    func cleanRawValue()->String{
+        return rawValue.replacingOccurrences(of: "\'", with: "");
     }
+}
+
+public extension UIDevice {
+    
+    var modelName: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        
+        switch identifier {
+        case "iPod5,1":                                 return "iPod Touch 5"
+        case "iPod7,1":                                 return "iPod Touch 6"
+        case "iPhone3,1", "iPhone3,2", "iPhone3,3":     return "iPhone 4"
+        case "iPhone4,1":                               return "iPhone 4s"
+        case "iPhone5,1", "iPhone5,2":                  return "iPhone 5"
+        case "iPhone5,3", "iPhone5,4":                  return "iPhone 5c"
+        case "iPhone6,1", "iPhone6,2":                  return "iPhone 5s"
+        case "iPhone7,2":                               return "iPhone 6"
+        case "iPhone7,1":                               return "iPhone 6 Plus"
+        case "iPhone8,1":                               return "iPhone 6s"
+        case "iPhone8,2":                               return "iPhone 6s Plus"
+        case "iPhone9,1", "iPhone9,3":                  return "iPhone 7"
+        case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
+        case "iPhone8,4":                               return "iPhone SE"
+        case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
+        case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
+        case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
+        case "iPad4,1", "iPad4,2", "iPad4,3":           return "iPad Air"
+        case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
+        case "iPad6,11", "iPad6,12":                    return "iPad 5"
+        case "iPad2,5", "iPad2,6", "iPad2,7":           return "iPad Mini"
+        case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
+        case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
+        case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
+        case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch"
+        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch 2. Generation"
+        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
+        case "AppleTV5,3":                              return "Apple TV"
+        case "i386", "x86_64":                          return "Simulator"
+        default:                                        return identifier
+        }
+    }
+    
 }
 
 {{#usePromiseKit}}extension RequestBuilder {
