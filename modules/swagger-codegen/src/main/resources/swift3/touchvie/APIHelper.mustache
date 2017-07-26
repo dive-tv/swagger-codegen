@@ -370,22 +370,22 @@ public class AuthManager: NSObject {
         keychainAccess.setPasscode(identifier: REFRESH_TOKEN, passcode:token);
     }
     
-    class func getDiveToken()->String?{
+    public class func getDiveToken()->String?{
         let keychainAccess = KeychainAccess();
         return keychainAccess.getPasscode(identifier: DIVE_KEY);
     }
     
-    class func getFacebookToken()->String?{
+    public class func getFacebookToken()->String?{
         let keychainAccess = KeychainAccess();
         return keychainAccess.getPasscode(identifier: FACEBOOK_KEY);
     }
     
-    class func getDeviceToken()->String?{
+    public class func getDeviceToken()->String?{
         let keychainAccess = KeychainAccess();
         return keychainAccess.getPasscode(identifier: DEVICE_TOKEN);
     }
     
-    class func getRefreshToken()->String?{
+    public class func getRefreshToken()->String?{
         let keychainAccess = KeychainAccess();
         return keychainAccess.getPasscode(identifier: REFRESH_TOKEN);
     }
