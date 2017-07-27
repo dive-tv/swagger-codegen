@@ -7,7 +7,21 @@
 import Foundation
 
 open class {{projectName}}API {
-    open static var basePath = "{{basePath}}"
+
+    #if PRO
+        open static var basePath = "{{basePath}}"
+    #elseif DEMO
+        open static var basePath = "{{basePath}}"
+    #elseif BETA
+        open static var basePath = "{{basePath}}"
+    #elseif PRE
+        open static var basePath = "https://pre-api.dive.tv/v1"
+    #else
+        open static var basePath = "https://dev-api.dive.tv/v1"
+    #endif
+
+
+    
     open static var credential: URLCredential?
     open static var customHeaders: [String:String] = [:]
     static var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory()

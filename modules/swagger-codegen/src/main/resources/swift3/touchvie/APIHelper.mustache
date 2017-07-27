@@ -237,6 +237,12 @@ struct KeychainAccess {
     }
 }
 
+public protocol AuthManagerDelegate : class {
+    
+    func logout()
+}
+
+
 public class AuthManager: NSObject {
     
     private struct AuthData {
@@ -248,6 +254,10 @@ public class AuthManager: NSObject {
     }
     
     private static var autorization : String?;
+    private static var totalErrors = 3
+    private static var errorCountdown = AuthManager.totalErrors
+    public static weak var delegate : AuthManagerDelegate?
+
     
      class func setAutorization(){
         
@@ -274,10 +284,9 @@ public class AuthManager: NSObject {
 
     public class func postToken(_deviceID : String? = nil, _userName : String? = nil, _password : String? = nil, _fbToken : String? = nil, _googleToken : String? = nil, _completion: @escaping ((_ _response : Response<AccessTokenResponse>?, _ _error : Error?) -> Void)){
         
-          if (self.autorization == nil) {
+        if (self.autorization == nil) {
            
             self.setAutorization()
-            
         }
         
         var _grantType : DiveAPI.grantType_postToken? = nil;
@@ -324,15 +333,29 @@ public class AuthManager: NSObject {
         
         if (_grantType != nil){
 
+            if (self.errorCountdown == 0) {
+                self.logout()
+                self.delegate?.logout()
+                //_completion(nil, nil)
+                return;
+            }
+            
+            self.errorCountdown -= 1
+
+
             DiveAPI.postTokenWithRequestBuilder(grantType: _grantType!, username: _authData.username, password: _authData.password, token: _authData.token, deviceId: _authData.device_id, refreshToken: _authData.refresh_token, _completion: { (_response : Response<AccessTokenResponse>?, _error : Error?) in
                 
-                //store the new token in the keychain
-                self.saveDiveTokenInKeyChain(token: "Bearer " + _response!.body!.accessToken!);
-                
-                //update the header with the new token
-                DiveAPI.updateTokenCommonHeader();
-                
-                //commonHeaders["Authorization"] = AuthData.getDiveToken();
+                if (_response?.body != nil) {
+                    
+                    self.saveDiveTokenInKeyChain(token: "Bearer " + _response!.body!.accessToken!);
+                    self.saveRefreshTokenInKeyChain(token: _response!.body!.refreshToken!)
+                    
+                    //update the header with the new token
+                    DiveAPI.updateTokenCommonHeader();
+                    
+                    //commonHeaders["Authorization"] = AuthData.getDiveToken();
+                }
+
                 
                 _completion(_response, _error);
                 
@@ -389,6 +412,41 @@ public class AuthManager: NSObject {
         let keychainAccess = KeychainAccess();
         return keychainAccess.getPasscode(identifier: REFRESH_TOKEN);
     }
+
+    class func removeDiveToken(){
+        let prefs = UserDefaults.standard;
+        prefs.set(nil, forKey: DIVE_KEY);
+        prefs.synchronize();
+    }
+    
+    class func removeFacebookToken (){
+        let prefs = UserDefaults.standard;
+        prefs.set(nil, forKey: FACEBOOK_KEY);
+        prefs.synchronize();
+    }
+
+    
+    class func removeDeviceToken(){
+        let prefs = UserDefaults.standard;
+        prefs.set(nil, forKey: DEVICE_TOKEN);
+        prefs.synchronize();
+    }
+    
+    class func removeRefreshToken(){
+        let prefs = UserDefaults.standard;
+        prefs.set(nil, forKey: REFRESH_TOKEN);
+        prefs.synchronize();
+    }
+    
+    public class func logout () {
+        
+        self.errorCountdown = self.totalErrors
+        self.removeDiveToken()
+        self.removeDeviceToken()
+        self.removeRefreshToken()
+        self.removeFacebookToken()
+    }
+
 }
 
 
