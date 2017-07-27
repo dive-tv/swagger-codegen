@@ -18,7 +18,7 @@ extension {{projectName}}API {
 open class DiveAPI: APIBase {
 
 
- static var appType: AppName = .DIVE {
+ public static var appType: AppName = .DIVE {
         
         didSet {
             AuthManager.setAutorization()
