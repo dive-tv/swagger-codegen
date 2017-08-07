@@ -26,7 +26,7 @@ public enum {{classname}}: {{dataType}} {
 public typealias {{classname}} = {{dataType}}
 {{/vars.isEmpty}}
 {{^vars.isEmpty}}
-open class {{classname}}: NSObject, {{#parent}}{{{parent}}}{{/parent}}{{^parent}}JSONEncodable{{/parent}} {
+open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject, JSONEncodable{{/parent}} {
 {{#vars}}
 {{#isEnum}}
     public enum {{enumName}}: {{^isContainer}}{{datatype}}{{/isContainer}}{{#isContainer}}String{{/isContainer}} { {{#allowableValues}}{{#enumVars}}
