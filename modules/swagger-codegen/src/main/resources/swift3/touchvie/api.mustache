@@ -18,9 +18,19 @@ extension {{projectName}}API {
 open class DiveAPI: APIBase {
 
 
-    public static var appType: AppName = .DIVE {
-
+    public class func configure (withApp app: AppName, withEnviroment envairoment: iOSSwaggerClientAPI.enviromentAPIEnum) {
         
+        DiveAPI.appType = app
+        iOSSwaggerClientAPI.enviromentAPI = envairoment
+    }
+    
+    public class func getAppName () -> AppName {
+        return DiveAPI.appType
+    }
+    
+
+    static var appType: AppName = .DIVE {
+
         didSet {
             AuthManager.setAutorization()
         }

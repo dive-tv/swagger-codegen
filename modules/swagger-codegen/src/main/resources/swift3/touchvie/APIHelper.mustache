@@ -17,27 +17,64 @@ let CARRUSEL_CONFIG_VERSION = "";
 //Token
 let DEVICE_TOKEN = "deviceToken";
 
-#if PRO
-let DIVE_KEY = "SDKToken";
-let REFRESH_TOKEN = "SDKrefreshToken";
-let FACEBOOK_KEY = "SDKfacebookToken";
-#elseif DEMO
-let DIVE_KEY = "SDKdiveTokenDemo";
-let REFRESH_TOKEN = "SDKrefreshTokenDemo";
-let FACEBOOK_KEY = "SDKfacebookTokenDemo";
-#elseif BETA
-let DIVE_KEY = "SDKTokenBeta";
-let REFRESH_TOKEN = "SDKrefreshTokenBeta";
-let FACEBOOK_KEY = "SDKfacebookTokenBeta";
-#elseif PRE
-let DIVE_KEY = "SDKTokenPre";
-let REFRESH_TOKEN = "SDKrefreshTokenPre";
-let FACEBOOK_KEY = "SDKfacebookTokenPre";
-#else
-let DIVE_KEY = "SDKTokenDev";
-let REFRESH_TOKEN = "SDKrefreshTokenDev";
-let FACEBOOK_KEY = "SDKfacebookTokenDev";
-#endif
+var DIVE_KEY : String {
+    
+    get {
+        switch iOSSwaggerClientAPI.enviromentAPI {
+        case .dev:
+            return "diveTokenDev"
+        case .pre:
+            return "diveTokenPre"
+        case .pro:
+            return "diveToken"
+        case .demo:
+            return "refreshTokenDemo"
+        case .beta:
+            return "refreshTokenBeta"
+        }
+    }
+}
+
+var REFRESH_TOKEN : String {
+    
+    get {
+        switch iOSSwaggerClientAPI.enviromentAPI {
+        case .dev:
+            return "refreshTokenDev"
+        case .pre:
+            return "refreshTokenPre"
+        case .pro:
+            return "refreshToken"
+        case .demo:
+            return "diveTokenDemo"
+        case .beta:
+            return "diveTokenBeta"
+        }
+    }
+}
+
+var FACEBOOK_KEY : String {
+    
+    get {
+        switch iOSSwaggerClientAPI.enviromentAPI {
+        case .dev:
+            return "facebookTokenDev"
+        case .pre:
+            return "facebookTokenPre"
+        case .pro:
+            return "facebookToken"
+        case .demo:
+            return "facebookTokenDemo"
+        case .beta:
+            return "facebookTokenBeta"
+        }
+    }
+}
+
+let URL_DEV = "https://dev-api.dive.tv/v1"
+let URL_PRE = "https://pre-api.dive.tv/v1"
+let URL_PRO = "https://api.dive.tv/v1"
+
 
 //Dive Get Token Keys
 let DIVE_MOBILE_IOS = "Basic " + "dive_mobile_ios:zrCyEz2qZHRzEWXZkGHxjUB53xhtKjdR".toBase64();

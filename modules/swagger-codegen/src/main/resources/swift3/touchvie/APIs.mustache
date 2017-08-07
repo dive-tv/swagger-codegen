@@ -8,28 +8,29 @@ import Foundation
 
 open class {{projectName}}API {
 
-    #if PRO
-        open static var basePath = "{{basePath}}"
-    #elseif DEMO
-        open static var basePath = "{{basePath}}"
-    #elseif BETA
-        open static var basePath = "{{basePath}}"
-    #elseif PRE
-        open static var basePath = "https://pre-api.dive.tv/v1"
-    #else
-        open static var basePath = "https://dev-api.dive.tv/v1"
-    #endif
-
-
-    
-    open static var credential: URLCredential?
-    open static var customHeaders: [String:String] = [:]
-    static var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory()
-
-    func setBasePath(_path : String){
-        iOSSwaggerClientAPI.basePath = _path;
+    public enum enviromentAPIEnum {
+        case pre, pro, dev, beta, demo;
     }
 
+    open static var enviromentAPI : enviromentAPIEnum = .dev
+    open static var credential: URLCredential?
+    open static var customHeaders: [String:String] = [:]
+    
+    static var basePath : String {
+        
+        get {
+            switch iOSSwaggerClientAPI.enviromentAPI {
+            case .dev:
+                return URL_DEV
+            case .pre:
+                return URL_PRE
+            default:
+                return URL_PRO
+            }
+        }
+    }
+    
+    static var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory()
 }
 
 open class APIBase {
