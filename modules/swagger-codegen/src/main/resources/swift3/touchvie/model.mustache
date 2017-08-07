@@ -46,7 +46,7 @@ open class {{classname}}: NSObject, {{#parent}}{{{parent}}}{{/parent}}{{^parent}
 {{/vars}}
 
 {{^unwrapRequired}}
-    {{^parent}}public init() {}{{/parent}}
+    {{^parent}}public override init() {}{{/parent}}
 {{/unwrapRequired}}
 {{#unwrapRequired}}
     public init({{#allVars}}{{^-first}}, {{/-first}}{{name}}: {{#isEnum}}{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{^required}}?=nil{{/required}}{{/allVars}}) {
