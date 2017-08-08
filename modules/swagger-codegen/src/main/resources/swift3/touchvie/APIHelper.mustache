@@ -272,6 +272,16 @@ struct KeychainAccess {
         }
         return passcode
     }
+
+    func removePasscode(identifier: String) {
+        
+        let keychainQuery = [
+            kSecClassValue: kSecClassGenericPasswordValue,
+            kSecAttrServiceValue: identifier,
+            ] as CFDictionary
+        print(SecItemDelete(keychainQuery))
+    }
+
 }
 
 public protocol AuthManagerDelegate : class {
@@ -451,28 +461,24 @@ public class AuthManager: NSObject {
     }
 
     class func removeDiveToken(){
-        let prefs = UserDefaults.standard;
-        prefs.set(nil, forKey: DIVE_KEY);
-        prefs.synchronize();
+        let keychainAccess = KeychainAccess()
+        keychainAccess.removePasscode(identifier: DIVE_KEY)
     }
     
     class func removeFacebookToken (){
-        let prefs = UserDefaults.standard;
-        prefs.set(nil, forKey: FACEBOOK_KEY);
-        prefs.synchronize();
+        let keychainAccess = KeychainAccess()
+        keychainAccess.removePasscode(identifier: FACEBOOK_KEY)
     }
 
     
     class func removeDeviceToken(){
-        let prefs = UserDefaults.standard;
-        prefs.set(nil, forKey: DEVICE_TOKEN);
-        prefs.synchronize();
+        let keychainAccess = KeychainAccess()
+        keychainAccess.removePasscode(identifier: DEVICE_TOKEN)
     }
     
     class func removeRefreshToken(){
-        let prefs = UserDefaults.standard;
-        prefs.set(nil, forKey: REFRESH_TOKEN);
-        prefs.synchronize();
+        let keychainAccess = KeychainAccess()
+        keychainAccess.removePasscode(identifier: REFRESH_TOKEN)
     }
     
     public class func logout () {
