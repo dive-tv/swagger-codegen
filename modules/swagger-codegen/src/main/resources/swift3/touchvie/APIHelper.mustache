@@ -10,9 +10,6 @@ import Security
 
 //API versions
 let API_VERSION = "v1/";
-let SYNC_AUDIO_VERSION = "v6"
-let CHUNK_VERSION = "v4";
-let CARRUSEL_CONFIG_VERSION = "";
 
 //Token
 let DEVICE_TOKEN = "deviceToken";
@@ -28,9 +25,9 @@ var DIVE_KEY : String {
         case .pro:
             return "diveToken"
         case .demo:
-            return "refreshTokenDemo"
+            return "diveTokenDemo"
         case .beta:
-            return "refreshTokenBeta"
+            return "diveTokenBeta"
         }
     }
 }
@@ -46,9 +43,9 @@ var REFRESH_TOKEN : String {
         case .pro:
             return "refreshToken"
         case .demo:
-            return "diveTokenDemo"
+            return "refreshTokenDemo"
         case .beta:
-            return "diveTokenBeta"
+            return "refreshTokenBeta"
         }
     }
 }
@@ -396,11 +393,6 @@ public class AuthManager: NSObject {
                     
                     self.saveDiveTokenInKeyChain(token: "Bearer " + _response!.body!.accessToken!);
                     self.saveRefreshTokenInKeyChain(token: _response!.body!.refreshToken!)
-                    
-                    //update the header with the new token
-                    DiveAPI.updateTokenCommonHeader();
-                    
-                    //commonHeaders["Authorization"] = AuthData.getDiveToken();
                 }
 
                 
@@ -423,6 +415,9 @@ public class AuthManager: NSObject {
     class func saveDiveTokenInKeyChain(token : String){
         let keychainAccess = KeychainAccess();
         keychainAccess.setPasscode(identifier: DIVE_KEY, passcode:token);
+
+        //update the header with the new token
+        DiveAPI.updateTokenCommonHeader();
     }
     
     class func saveFacebookTokenInKeyChain(token : String){

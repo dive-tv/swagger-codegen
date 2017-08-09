@@ -40,7 +40,8 @@ open class DiveAPI: APIBase {
                                                            "Accept-Language" : APIHelper.getLanguage(),
                                                            "Accept-Encoding" : "gzip",
                                                            "Connection" : "keep-alive",
-                                                           "User-Agent": APIHelper.getUserAgent()];
+                                                           "User-Agent": APIHelper.getUserAgent(),
+                                                           "Authorization": AuthManager.getDiveToken() ?? ""];
     
     open class func updateTokenCommonHeader(){
         self.commonHeaders["Authorization"] = AuthManager.getDiveToken();
@@ -138,21 +139,30 @@ open class DiveAPI: APIBase {
                         switch(statusCode){
                             //Unauthorized call
                             case 401:
-                            print("ERROR OF AUTH");
+
+                            if (path != "/token") {
+
+                                print("ERROR OF AUTH");
                             
-                            // refresh token
-                            AuthManager.postToken(_completion: { (_response : Response<AccessTokenResponse>?, _error : Error?) in
+                                // refresh token
+                                AuthManager.postToken(_completion: { (_response : Response<AccessTokenResponse>?, _error : Error?) in
                                 
-                                //rebuild the request with the autentication correct values
-                                rb = requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false, headers: commonHeaders)
+                                   //rebuild the request with the autentication correct values
+                                    rb = requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false, headers: commonHeaders)
                                 
-                                if(_headers != nil){
-                                    rb.addHeaders(_headers!);
-                                }
-                                rb.execute ({ (_response : Response<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>?, _error : Error?) in
-                                    _completion(_response, _error);
+                                    if(_headers != nil){
+                                        rb.addHeaders(_headers!);
+                                    }
+                                    rb.execute ({ (_response : Response<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>?, _error : Error?) in
+                                        _completion(_response, _error);
+                                    });
                                 });
-                            });
+
+                            } else {
+
+                                _completion(_response, _error)
+                            }
+                            
 
 
                             break;
