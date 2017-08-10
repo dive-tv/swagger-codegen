@@ -8,9 +8,10 @@ import Foundation
 
 open class {{projectName}}API {
 
-    public enum enviromentAPIEnum {
-        case pre, pro, dev, beta, demo;
+    public enum enviromentAPIEnum: String {
+        case pre = "pre", pro = "pro", dev = "dev", beta = "beta", demo = "demo";
     }
+
 
     open static var enviromentAPI : enviromentAPIEnum = .dev
     open static var credential: URLCredential?

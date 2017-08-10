@@ -12,7 +12,8 @@ import Security
 let API_VERSION = "v1/";
 
 //Token
-let DEVICE_TOKEN = "deviceToken";
+let DEVICE_LOGIN_TOKEN = "deviceLoginToken";
+
 
 var DIVE_KEY : String {
     
@@ -427,7 +428,7 @@ public class AuthManager: NSObject {
     
     class func saveDeviceTokenInKeyChain(token : String){
         let keychainAccess = KeychainAccess();
-        keychainAccess.setPasscode(identifier: DEVICE_TOKEN, passcode:token);
+        keychainAccess.setPasscode(identifier: DEVICE_LOGIN_TOKEN, passcode:token);
     }
     
     class func saveRefreshTokenInKeyChain(token : String){
@@ -447,7 +448,7 @@ public class AuthManager: NSObject {
     
     public class func getDeviceToken()->String?{
         let keychainAccess = KeychainAccess();
-        return keychainAccess.getPasscode(identifier: DEVICE_TOKEN);
+        return keychainAccess.getPasscode(identifier: DEVICE_LOGIN_TOKEN);
     }
     
     public class func getRefreshToken()->String?{
@@ -468,7 +469,7 @@ public class AuthManager: NSObject {
     
     class func removeDeviceToken(){
         let keychainAccess = KeychainAccess()
-        keychainAccess.removePasscode(identifier: DEVICE_TOKEN)
+        keychainAccess.removePasscode(identifier: DEVICE_LOGIN_TOKEN)
     }
     
     class func removeRefreshToken(){
