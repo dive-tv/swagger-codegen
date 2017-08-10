@@ -414,6 +414,9 @@ public class AuthManager: NSObject {
     }
     
     class func saveDiveTokenInKeyChain(token : String){
+        
+        self.saveKeyInUserDefaults(key: DIVE_KEY)
+        
         let keychainAccess = KeychainAccess();
         keychainAccess.setPasscode(identifier: DIVE_KEY, passcode:token);
 
@@ -422,57 +425,83 @@ public class AuthManager: NSObject {
     }
     
     class func saveFacebookTokenInKeyChain(token : String){
+        self.saveKeyInUserDefaults(key: FACEBOOK_KEY)
         let keychainAccess = KeychainAccess();
         keychainAccess.setPasscode(identifier: FACEBOOK_KEY, passcode:token);
     }
     
     class func saveDeviceTokenInKeyChain(token : String){
+        self.saveKeyInUserDefaults(key: DEVICE_LOGIN_TOKEN)
         let keychainAccess = KeychainAccess();
         keychainAccess.setPasscode(identifier: DEVICE_LOGIN_TOKEN, passcode:token);
     }
     
     class func saveRefreshTokenInKeyChain(token : String){
+        self.saveKeyInUserDefaults(key: REFRESH_TOKEN)
         let keychainAccess = KeychainAccess();
         keychainAccess.setPasscode(identifier: REFRESH_TOKEN, passcode:token);
     }
     
     public class func getDiveToken()->String?{
-        let keychainAccess = KeychainAccess();
-        return keychainAccess.getPasscode(identifier: DIVE_KEY);
+        if self.getValueFromUserDefaults(key: DIVE_KEY) != nil {
+            let keychainAccess = KeychainAccess();
+            return keychainAccess.getPasscode(identifier: DIVE_KEY);
+        }
+        
+        return nil
     }
     
     public class func getFacebookToken()->String?{
-        let keychainAccess = KeychainAccess();
-        return keychainAccess.getPasscode(identifier: FACEBOOK_KEY);
+        
+        if self.getValueFromUserDefaults(key: FACEBOOK_KEY) != nil {
+            let keychainAccess = KeychainAccess();
+            return keychainAccess.getPasscode(identifier: FACEBOOK_KEY);
+        }
+        return nil
+        
     }
     
     public class func getDeviceToken()->String?{
-        let keychainAccess = KeychainAccess();
-        return keychainAccess.getPasscode(identifier: DEVICE_LOGIN_TOKEN);
+        
+        if self.getValueFromUserDefaults(key: DEVICE_LOGIN_TOKEN) != nil {
+            
+            let keychainAccess = KeychainAccess();
+            return keychainAccess.getPasscode(identifier: DEVICE_LOGIN_TOKEN);
+        }
+        
+        return nil
     }
     
     public class func getRefreshToken()->String?{
-        let keychainAccess = KeychainAccess();
-        return keychainAccess.getPasscode(identifier: REFRESH_TOKEN);
+        if self.getValueFromUserDefaults(key: REFRESH_TOKEN) != nil {
+        
+            let keychainAccess = KeychainAccess();
+            return keychainAccess.getPasscode(identifier: REFRESH_TOKEN);
+        }
+        return nil
     }
 
     class func removeDiveToken(){
+        self.removeKeyFromUserDefaults(key: DIVE_KEY)
         let keychainAccess = KeychainAccess()
         keychainAccess.removePasscode(identifier: DIVE_KEY)
     }
     
     class func removeFacebookToken (){
+        self.removeKeyFromUserDefaults(key: FACEBOOK_KEY)
         let keychainAccess = KeychainAccess()
         keychainAccess.removePasscode(identifier: FACEBOOK_KEY)
     }
 
     
     class func removeDeviceToken(){
+        self.removeKeyFromUserDefaults(key: DEVICE_LOGIN_TOKEN)
         let keychainAccess = KeychainAccess()
         keychainAccess.removePasscode(identifier: DEVICE_LOGIN_TOKEN)
     }
     
     class func removeRefreshToken(){
+        self.removeKeyFromUserDefaults(key: REFRESH_TOKEN)
         let keychainAccess = KeychainAccess()
         keychainAccess.removePasscode(identifier: REFRESH_TOKEN)
     }
@@ -485,6 +514,25 @@ public class AuthManager: NSObject {
         self.removeRefreshToken()
         self.removeFacebookToken()
     }
+    
+    
+    class func saveKeyInUserDefaults(key : String){
+        let prefs = UserDefaults.standard;
+        prefs.set(key, forKey: key);
+        prefs.synchronize();
+    }
+    
+    class func removeKeyFromUserDefaults(key : String){
+        let prefs = UserDefaults.standard;
+        prefs.set(nil, forKey: key);
+        prefs.synchronize();
+    }
+    
+    class func getValueFromUserDefaults(key : String) -> String?{
+        let prefs = UserDefaults.standard;
+        return prefs.value(forKey: key) as? String;
+    }
+
 
 }
 
