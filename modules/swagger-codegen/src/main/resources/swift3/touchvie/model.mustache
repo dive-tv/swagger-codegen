@@ -57,7 +57,7 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
     }
 {{/unwrapRequired}}
 */
-    public init?(sourceDictionary: [AnyHashable: Any]) {
+    public {{#parent}}override{{/parent}} init?(sourceDictionary: [AnyHashable: Any]) {
 
     {{#vars}}
     {{#isEnum}}
@@ -69,7 +69,7 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
 
     {{/isEnum}}
     {{^isEnum}}
-        if let nameData = sourceDictionary["{{baseName}}"] as AnyObject?, let {{name}} = Decoders.decode(clazz: {{{baseType}}}.self, source: nameData){
+        if let nameData = sourceDictionary["{{baseName}}"] as AnyObject?, let {{name}} = Decoders.decodeOptional(clazz: {{{baseType}}}.self, source: nameData){
             self.{{name}} = {{name}}
         }{{#required}} else {
             return nil
@@ -77,7 +77,7 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
     {{/isEnum}}
     {{/vars}}
 
-    {{#parent}}super.init(sourceDictionary: sourceDictionary){{/parent}}
+        {{#parent}}super.init(sourceDictionary: sourceDictionary){{/parent}}
     }
 
     // MARK: JSONEncodable
