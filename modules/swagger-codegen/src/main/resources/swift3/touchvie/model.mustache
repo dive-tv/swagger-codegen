@@ -46,11 +46,10 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
 {{/vars}}
 
     public init({{#allVars}}{{^-first}}, {{/-first}}{{name}}: {{#isEnum}}{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{^required}}?=nil{{/required}}{{/allVars}}) {
-
-        {{#allVars}}
+        {{#vars}}
         self.{{name}} = {{name}}
-        {{/allVars}}
-        {{#parent}}super.init({{#parentVars}}{{#required}}{{^-first}}, {{/-first}}{{name}}: {{name}}{{/required}}{{/parentVars}}){{/parent}}
+        {{/vars}}
+        {{#parent}}super.init({{#parentVars}}{{^-first}}, {{/-first}}{{name}}: {{name}}{{/parentVars}}){{/parent}}
     }
 /*
 {{#unwrapRequired}}
