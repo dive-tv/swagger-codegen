@@ -37,14 +37,14 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
 {{#vars}}
 {{#isEnum}}
     {{#description}}/** {{description}} */
-    {{/description}}public var {{name}}: {{{datatypeWithEnum}}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
+    {{/description}}public var {{name}}: {{{datatypeWithEnum}}}{{^required}}?{{/required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
 {{/isEnum}}
 {{^isEnum}}
     {{#description}}/** {{description}} */
-    {{/description}}public var {{name}}: {{{datatype}}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
+    {{/description}}public var {{name}}: {{{datatype}}}{{^required}}?{{/required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
 {{/isEnum}}
 {{/vars}}
-
+/*
 {{^unwrapRequired}}
     {{^parent}}public override init() {}{{/parent}}
 {{/unwrapRequired}}
@@ -56,17 +56,41 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
         {{#parent}}super.init({{#parentVars}}{{^-first}}, {{/-first}}{{name}}: {{name}}{{/parentVars}}){{/parent}}
     }
 {{/unwrapRequired}}
+*/
+    public init?(sourceDictionary: [AnyHashable: Any]) {
+
+    {{#vars}}
+    {{#isEnum}}
+        if let nameData = sourceDictionary["{{baseName}}"], let typeName = nameData as? String, let {{name}} = {{classname}}.{{datatypeWithEnum}}(rawValue: typeName) {
+            self.{{name}} = {{name}}
+        }{{#required}} else {
+            return nil
+        }{{/required}}
+
+    {{/isEnum}}
+    {{^isEnum}}
+        if let nameData = sourceDictionary["{{baseName}}"] as AnyObject?, let {{name}} = Decoders.decode(clazz: {{{baseType}}}.self, source: nameData){
+            self.{{name}} = {{name}}
+        }{{#required}} else {
+            return nil
+        }{{/required}}
+    {{/isEnum}}
+    {{/vars}}
+
+    {{#parent}}super.init(sourceDictionary: sourceDictionary){{/parent}}
+    }
 
     // MARK: JSONEncodable
     {{#parent}}override {{/parent}}open func encodeToJSON() -> Any {
-        var nillableDictionary = {{#parent}}super.encodeToJSON() as? [String:Any?] ?? {{/parent}}[String:Any?](){{#vars}}{{#isNotContainer}}{{#isPrimitiveType}}{{^isEnum}}{{#isInteger}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.encodeToJSON(){{/isInteger}}{{#isLong}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.encodeToJSON(){{/isLong}}{{^isLong}}{{^isInteger}}
+        var nillableDictionary = {{#parent}}super.encodeToJSON() as? [String:Any?] ?? {{/parent}}[String:Any?]()
+        {{#vars}}{{#isNotContainer}}{{#isPrimitiveType}}{{^isEnum}}{{#isInteger}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.encodeToJSON(){{/isInteger}}{{#isLong}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.encodeToJSON(){{/isLong}}{{^isLong}}{{^isInteger}}
         nillableDictionary["{{baseName}}"] = self.{{name}}{{/isInteger}}{{/isLong}}{{/isEnum}}{{/isPrimitiveType}}{{#isEnum}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.cleanRawValue(){{/isEnum}}{{^isPrimitiveType}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.encodeToJSON(){{/isPrimitiveType}}{{/isNotContainer}}{{#isContainer}}{{^isEnum}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.encodeToJSON(){{/isEnum}}{{#isEnum}}{{#isListContainer}}
-        nillableDictionary["{{baseName}}"] = self.{{name}}{{^unwrapRequired}}?{{/unwrapRequired}}{{#unwrapRequired}}{{^required}}?{{/required}}{{/unwrapRequired}}.map({$0.rawValue}).encodeToJSON(){{/isListContainer}}{{#isMapContainer}}//TODO: handle enum map scenario{{/isMapContainer}}{{/isEnum}}{{/isContainer}}{{/vars}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.cleanRawValue(){{/isEnum}}{{^isPrimitiveType}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.encodeToJSON(){{/isPrimitiveType}}{{/isNotContainer}}{{#isContainer}}{{^isEnum}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.encodeToJSON(){{/isEnum}}{{#isEnum}}{{#isListContainer}}
+        nillableDictionary["{{baseName}}"] = self.{{name}}{{^required}}?{{/required}}.map({$0.rawValue}).encodeToJSON(){{/isListContainer}}{{#isMapContainer}}//TODO: handle enum map scenario{{/isMapContainer}}{{/isEnum}}{{/isContainer}}{{/vars}}
         let dictionary: [String:Any] = APIHelper.rejectNil(nillableDictionary) ?? [:]
         return dictionary
     }
