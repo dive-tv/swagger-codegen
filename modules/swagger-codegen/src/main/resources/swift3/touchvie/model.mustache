@@ -44,10 +44,15 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
     {{/description}}public var {{name}}: {{{datatype}}}{{^required}}?{{/required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
 {{/isEnum}}
 {{/vars}}
+
+    public {{#parent}}override{{/parent}} init({{#allVars}}{{^-first}}, {{/-first}}{{^required}}{{name}}: {{#isEnum}}{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{/required}}{{/allVars}}) {
+
+        {{#vars}}
+        self.{{name}} = {{name}}
+        {{/vars}}
+        {{#parent}}super.init({{#parentVars}}{{^-first}}, {{/-first}}{{name}}: {{name}}{{/parentVars}}){{/parent}}
+    }
 /*
-{{^unwrapRequired}}
-    {{^parent}}public override init() {}{{/parent}}
-{{/unwrapRequired}}
 {{#unwrapRequired}}
     public init({{#allVars}}{{^-first}}, {{/-first}}{{name}}: {{#isEnum}}{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{^required}}?=nil{{/required}}{{/allVars}}) {
         {{#vars}}
@@ -57,6 +62,7 @@ open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}NSObject,
     }
 {{/unwrapRequired}}
 */
+
     public {{#parent}}override{{/parent}} init?(sourceDictionary: [AnyHashable: Any]) {
 
     {{#vars}}
