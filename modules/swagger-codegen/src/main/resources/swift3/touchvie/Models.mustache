@@ -56,7 +56,7 @@ class Decoders {
     static func decode<T>(clazz: [T].Type, source: AnyObject) -> [T]? {
         let array = source as! [AnyObject]
         let mapArray = array.flatMap { Decoders.decode(clazz: T.self, source: $0) }
-        return !mapArray.isEmpty ? mapArray : nil
+        return mapArray
     }
 
     static func decode<T, Key: Hashable>(clazz: [Key:T].Type, source: AnyObject) -> [Key:T] {
