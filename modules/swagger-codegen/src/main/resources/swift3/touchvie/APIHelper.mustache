@@ -245,7 +245,7 @@ struct KeychainAccess {
                 kSecValueDataValue: dataFromString
                 ] as CFDictionary
             SecItemDelete(keychainQuery)
-            print(SecItemAdd(keychainQuery, nil))
+            SecItemAdd(keychainQuery, nil)
         }
     }
     
@@ -277,7 +277,7 @@ struct KeychainAccess {
             kSecClassValue: kSecClassGenericPasswordValue,
             kSecAttrServiceValue: identifier,
             ] as CFDictionary
-        print(SecItemDelete(keychainQuery))
+        SecItemDelete(keychainQuery)
     }
 
 }
@@ -407,10 +407,6 @@ public class AuthManager: NSObject {
             let error = TokenWithoutGrantType();
             _completion(nil, error);
         }
-        
-        //print(postTokenRB.parameters!);
-        //print(postTokenRB.headers);
-        //print(postTokenRB.URLString);
     }
     
     class func saveDiveTokenInKeyChain(token : String){

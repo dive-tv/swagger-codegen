@@ -121,9 +121,7 @@ open class DiveAPI: APIBase {
         }
 
         rb.execute ({ (_response : Response<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>?, _error : Error?) in
-            
-            print(_error as Any);
-            print(_response as Any);
+        
             
             //if response its good, complete the request
             if(_response != nil){
